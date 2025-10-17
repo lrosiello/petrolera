@@ -1,0 +1,71 @@
+0xf2301369f401babe7ede29ba84b97b1659171d158787d8f404d66947eec831a7  para ver el proyecto
+
+1)crear petrolera
+sui client call --package 0x9cb1f34c15d9c8d7c050d0c03f8d17e5b7dba67b0f23a780209a18eb478b22a8 --module petrolera --function crear_petrolera --args "Petrogas"
+
+tener en cuenta que la petrolera tiene en su haber 20 mil millones de dolares
+
+
+
+------el PACKAGE_ID tiene el modulo
+2)agregar plataforma (requisito para extraer y obtener barriles de petroleo)
+
+sui client call --package $PACKAGE_ID --module petrolera --function agregar_plataforma --args 0xf2301369f401babe7ede29ba84b97b1659171d158787d8f404d66947eec831a7 "Plataforma central"
+
+---al instalar la plataforma, tiene un costo de 10 mil millones
+
+
+
+------el PETROLERA_OBJ tiene el id de la petrolera
+3)agregar refineria (requisito para convertir barriles en productos)
+
+sui client call --package $PACKAGE_ID --module petrolera --function agregar_refineria --args $PETROLERA_OBJ "Refineria central"
+
+---al instalar la refineria tiene un costo de 7 mil millones
+
+
+------OPERACIONES 
+4)extraer petroleo (genera un barril)
+
+sui client call --package $PACKAGE_ID --module petrolera --function extraer_petroleo --args $PETROLERA_OBJ 1
+
+---el argumento 1 como ejemplo es la plataforma previamente creada mediante la cual se produce el barril, es el mas posible ya que los ids se generan incrementalmente a partir de 1
+---al crearse el barril, la coleccion de barriles lo suma. Este barril cuesta 60 dolares.
+
+
+5)renombrar plataforma "un UPDATE"
+sui client call --package $PACKAGE_ID --module petrolera --function renombrar_plataforma --args $PETROLERA_OBJ 1 "Plataforma Central Petrogas"
+
+
+6)mejorar la capacidad de la plataforma "UPDATE"
+
+sui client call --package $PACKAGE_ID --module petrolera --function mejorar_capacidad_plataforma --args $PETROLERA_OBJ 1
+
+----La plataforma generaba 1 barril cada vez que llamabamos extraer_petroleo. Con esta mejora
+de un costo de 2 mil millones de dolares (nos queda 3 mil millones), podemos hacer que la plataforma aumente su capacidad en 5 barriles, por lo que generara 6 barriles cada llamado de extraer_petroleo. Probemos cuantos barriles genera.
+
+
+7)destilar_barril "tiene un delete barril y create productos"
+
+sui client call --package $PACKAGE_ID --module petrolera --function destilar_barril --args $PETROLERA_OBJ 1 1 "Etanol" "En frio" "gasoil"
+
+----Le pasamos como argumento la petrolera, el id 1 de la refineria, el id 1 del primer barril producido y los nombres de los productos: un petroquimico llamado Etanol, un Asfalto tipo En Frio y un combustible de tipo Gasoil. Estos tienen precios tambien dentro al instanciarse.
+
+
+
+8)vender todos los productos (petroquimicos,asfaltos y combustibles) "delete"
+
+sui client call --package $PACKAGE_ID --module petrolera --function vender_todos_los_productos --args $PETROLERA_OBJ
+----al venderlos, hemos ganado 150 dolares entre los productos producidos
+
+9)vender todos los barriles
+
+sui client call --package $PACKAGE_ID --module petrolera --function vender_todos_los_barriles --args $PETROLERA_OBJ
+---al venderlos hemos ganado 360 dolares por los 6 barriles
+
+10)desmontar plataforma
+sui client call --package $PACKAGE_ID --module petrolera --function desmontar_plataforma --args $PETROLERA_OBJ 1
+---- claramente hacemos un delete de una plataforma con id 1
+
+
+11)De esta forma, ya no hay mas dinero para poner una plataforma, ni barriles para producir productos ni para vender, nos quedo una petrolera con una refineria ociosas...
